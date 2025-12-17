@@ -15,7 +15,19 @@ const getUserSelfDetails = async (userId) => {
     }
 };
 
+const updateUserDetails = async (userId, firstName, lastName, email) => {
+    try {
+        await User.update(userId, {
+            firstname: firstName,
+            name: lastName,
+            email: email
+        })
+    } catch (error) {
+        throw { status: error?.status || 500, message: error?.message || error };
+    }
+}
 
 module.exports = {
-    getUserSelfDetails
+    getUserSelfDetails,
+    updateUserDetails,
 };

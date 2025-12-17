@@ -11,6 +11,20 @@ const getUserSelfDetails = async (req, res) => {
     }
 };
 
+const updateUserDetails = async (req, res) => {
+    const { firstName, lastName, email } = req.body;
+    const userId = req.auth.userId
+    try {
+        await usersService.updateUserDetails(userId, firstName, lastName, email)
+        res.status(200).json({ ok: true });
+    } catch (error) {
+        res
+            .status(error?.status || 500)
+            .send({ status: "FAILED", data: { error: error?.message || error } });
+    }
+}
+
 module.exports = {
     getUserSelfDetails,
+    updateUserDetails
 };
