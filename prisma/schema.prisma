@@ -1,0 +1,220 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model brackets {
+  Id_brackets Int       @id @default(autoincrement())
+  Id_event    Int
+  events      events    @relation(fields: [Id_event], references: [Id_event], onDelete: NoAction, onUpdate: NoAction, map: "brackets_ibfk_1")
+  contain     contain[]
+
+  @@index([Id_event], map: "Id_event")
+}
+
+model cities {
+  Id_cities       Int            @id @default(autoincrement())
+  name            String?        @db.VarChar(50)
+  Id_departements Int
+  departements    departements   @relation(fields: [Id_departements], references: [Id_departements], onDelete: NoAction, onUpdate: NoAction, map: "cities_ibfk_1")
+  universities    universities[]
+
+  @@index([Id_departements], map: "Id_departements")
+}
+
+model contain {
+  Id_matchs   Int
+  Id_brackets Int
+  matchs      matchs   @relation(fields: [Id_matchs], references: [Id_matchs], onDelete: NoAction, onUpdate: NoAction, map: "contain_ibfk_1")
+  brackets    brackets @relation(fields: [Id_brackets], references: [Id_brackets], onDelete: NoAction, onUpdate: NoAction, map: "contain_ibfk_2")
+
+  @@id([Id_matchs, Id_brackets])
+  @@index([Id_brackets], map: "Id_brackets")
+}
+
+model customStats {
+  Id_customStats Int          @id @default(autoincrement())
+  statName       String?      @db.VarChar(50)
+  statValue      String?      @db.VarChar(50)
+  isDefault      DateTime?    @db.DateTime(0)
+  Id_eventGames  Int
+  eventGames     eventGames   @relation(fields: [Id_eventGames], references: [Id_eventGames], onDelete: NoAction, onUpdate: NoAction, map: "customstats_ibfk_1")
+  eventStats     eventStats[]
+
+  @@index([Id_eventGames], map: "Id_eventGames")
+}
+
+model departements {
+  Id_departements Int      @id @default(autoincrement())
+  name            String?  @db.VarChar(50)
+  code            String?  @db.VarChar(50)
+  Id_regions      Int
+  cities          cities[]
+  regions         regions  @relation(fields: [Id_regions], references: [Id_regions], onDelete: NoAction, onUpdate: NoAction, map: "departements_ibfk_1")
+
+  @@index([Id_regions], map: "Id_regions")
+}
+
+model eventGames {
+  Id_eventGames Int           @id @default(autoincrement())
+  name          String?       @db.VarChar(50)
+  customStats   customStats[]
+  events        events[]
+}
+
+model eventStats {
+  Id_event       Int
+  Id_customStats Int
+  events         events      @relation(fields: [Id_event], references: [Id_event], onDelete: NoAction, onUpdate: NoAction, map: "eventstats_ibfk_1")
+  customStats    customStats @relation(fields: [Id_customStats], references: [Id_customStats], onDelete: NoAction, onUpdate: NoAction, map: "eventstats_ibfk_2")
+
+  @@id([Id_event, Id_customStats])
+  @@index([Id_customStats], map: "Id_customStats")
+}
+
+model events {
+  Id_event        Int                     @id @default(autoincrement())
+  name            String?                 @db.VarChar(50)
+  eventDate       DateTime?               @db.DateTime(0)
+  description     String?                 @db.VarChar(50)
+  maxTeam         Int?
+  leaderboardType events_leaderboardType?
+  Id_eventGames   Int
+  brackets        brackets[]
+  eventStats      eventStats[]
+  eventGames      eventGames              @relation(fields: [Id_eventGames], references: [Id_eventGames], onDelete: NoAction, onUpdate: NoAction, map: "events_ibfk_1")
+  participate     participate[]
+  refereeOn       refereeOn[]
+
+  @@index([Id_eventGames], map: "Id_eventGames")
+}
+
+model isPart {
+  id_user  Int
+  Id_teams Int
+  users    users @relation(fields: [id_user], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "ispart_ibfk_1")
+  teams    teams @relation(fields: [Id_teams], references: [Id_teams], onDelete: NoAction, onUpdate: NoAction, map: "ispart_ibfk_2")
+
+  @@id([id_user, Id_teams])
+  @@index([Id_teams], map: "Id_teams")
+}
+
+model matchs {
+  Id_matchs Int       @id @default(autoincrement())
+  round     String?   @db.VarChar(50)
+  dateMatch DateTime? @db.DateTime(0)
+  score     String?   @db.VarChar(50)
+  contain   contain[]
+  playing   playing[]
+}
+
+model participate {
+  id_user  Int
+  Id_event Int
+  Id_teams Int
+  role     String? @db.VarChar(50)
+  users    users   @relation(fields: [id_user], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "participate_ibfk_1")
+  events   events  @relation(fields: [Id_event], references: [Id_event], onDelete: NoAction, onUpdate: NoAction, map: "participate_ibfk_2")
+  teams    teams   @relation(fields: [Id_teams], references: [Id_teams], onDelete: NoAction, onUpdate: NoAction, map: "participate_ibfk_3")
+
+  @@id([id_user, Id_event, Id_teams])
+  @@index([Id_event], map: "Id_event")
+  @@index([Id_teams], map: "Id_teams")
+}
+
+model permission {
+  Id_roles        Int               @id @default(autoincrement())
+  name            String?           @db.VarChar(50)
+  userPermissions userPermissions[]
+}
+
+model playing {
+  Id_teams_1                                Int
+  Id_teams_2                                Int
+  Id_teams_winningTeam                      Int
+  Id_matchs                                 Int
+  dateCreate                                DateTime? @db.DateTime(0)
+  teams_playing_Id_teams_1Toteams           teams     @relation("playing_Id_teams_1Toteams", fields: [Id_teams_1], references: [Id_teams], onDelete: NoAction, onUpdate: NoAction, map: "playing_ibfk_1")
+  teams_playing_Id_teams_2Toteams           teams     @relation("playing_Id_teams_2Toteams", fields: [Id_teams_2], references: [Id_teams], onDelete: NoAction, onUpdate: NoAction, map: "playing_ibfk_2")
+  teams_playing_Id_teams_winningTeamToteams teams     @relation("playing_Id_teams_winningTeamToteams", fields: [Id_teams_winningTeam], references: [Id_teams], onDelete: NoAction, onUpdate: NoAction, map: "playing_ibfk_3")
+  matchs                                    matchs    @relation(fields: [Id_matchs], references: [Id_matchs], onDelete: NoAction, onUpdate: NoAction, map: "playing_ibfk_4")
+
+  @@id([Id_teams_1, Id_teams_2, Id_teams_winningTeam, Id_matchs])
+  @@index([Id_matchs], map: "Id_matchs")
+  @@index([Id_teams_2], map: "Id_teams_2")
+  @@index([Id_teams_winningTeam], map: "Id_teams_winningTeam")
+}
+
+model refereeOn {
+  id_user  Int
+  Id_event Int
+  users    users  @relation(fields: [id_user], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "refereeon_ibfk_1")
+  events   events @relation(fields: [Id_event], references: [Id_event], onDelete: NoAction, onUpdate: NoAction, map: "refereeon_ibfk_2")
+
+  @@id([id_user, Id_event])
+  @@index([Id_event], map: "Id_event")
+}
+
+model regions {
+  Id_regions   Int            @id @default(autoincrement())
+  name         String?        @db.VarChar(50)
+  departements departements[]
+}
+
+model teams {
+  Id_teams                                    Int           @id @default(autoincrement())
+  name                                        String?       @db.VarChar(50)
+  dateCreate                                  DateTime?     @db.DateTime(0)
+  isPart                                      isPart[]
+  participate                                 participate[]
+  playing_playing_Id_teams_1Toteams           playing[]     @relation("playing_Id_teams_1Toteams")
+  playing_playing_Id_teams_2Toteams           playing[]     @relation("playing_Id_teams_2Toteams")
+  playing_playing_Id_teams_winningTeamToteams playing[]     @relation("playing_Id_teams_winningTeamToteams")
+}
+
+model universities {
+  Id_universities Int     @id @default(autoincrement())
+  name            String? @db.VarChar(50)
+  Id_cities       Int
+  cities          cities  @relation(fields: [Id_cities], references: [Id_cities], onDelete: NoAction, onUpdate: NoAction, map: "universities_ibfk_1")
+  users           users[]
+
+  @@index([Id_cities], map: "Id_cities")
+}
+
+model userPermissions {
+  id_user    Int
+  Id_roles   Int
+  users      users      @relation(fields: [id_user], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "userpermissions_ibfk_1")
+  permission permission @relation(fields: [Id_roles], references: [Id_roles], onDelete: NoAction, onUpdate: NoAction, map: "userpermissions_ibfk_2")
+
+  @@id([id_user, Id_roles])
+  @@index([Id_roles], map: "Id_roles")
+}
+
+model users {
+  id_user         Int               @id @default(autoincrement())
+  name            String?           @db.VarChar(50)
+  firstname       String?           @db.VarChar(50)
+  email           String?           @db.VarChar(255)
+  password        String?           @db.VarChar(50)
+  photo           String?           @db.VarChar(50)
+  Id_universities Int
+  isPart          isPart[]
+  participate     participate[]
+  refereeOn       refereeOn[]
+  userPermissions userPermissions[]
+  universities    universities      @relation(fields: [Id_universities], references: [Id_universities], onDelete: NoAction, onUpdate: NoAction, map: "users_ibfk_1")
+
+  @@index([Id_universities], map: "Id_universities")
+}
+
+enum events_leaderboardType {
+  actif
+  inactif
+  en_attente @map("en attente")
+}
