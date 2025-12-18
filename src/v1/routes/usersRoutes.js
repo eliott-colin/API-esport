@@ -33,4 +33,13 @@ router.get(
      #swagger.security = [{ "bearerAuth": [] }] */
 );
 
+router.get(
+  "/:id/",
+  verifyToken,
+  usersController.getUserById,
+  /* #swagger.tags = ['Users']
+       #swagger.summary = 'Récupérer les informations d'un utilisateur'
+       #swagger.security = [{ "bearerAuth": [] }] */
+);
+
 module.exports = router;
