@@ -7,15 +7,18 @@ describe("User Connection", () => {
   it("should connect the user", async () => {
     //GIVEN
     const password = "test";
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await User.create({
-      name: "User",
-      firstname: "Test",
-      email: "test@gmail.com",
-      photo: "0753904652",
-      password: hashedPassword,
-      Id_universities: 1
-    });
+    await request(app)
+        .post("/api/v1/auth/register")
+        .set("content-type", "application/json")
+        .send({
+          firstName: "Test",
+          lastName: "User",
+          email: "test@gmail.com",
+          photo: "0753904652",
+          password: "test",
+          idUniversities: 1
+        });
+
     //WHEN
     const response = await request(app)
       .post("/api/v1/auth/login")
