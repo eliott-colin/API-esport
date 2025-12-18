@@ -21,9 +21,7 @@
   "paths": {
     "/api/v1/auth/register": {
       "post": {
-        "tags": [
-          "Authentication"
-        ],
+        "tags": ["Authentication"],
         "summary": "Inscription d\\'un nouvel utilisateur",
         "description": "",
         "responses": {
@@ -67,9 +65,7 @@
     },
     "/api/v1/auth/login": {
       "post": {
-        "tags": [
-          "Authentication"
-        ],
+        "tags": ["Authentication"],
         "summary": "Connexion utilisateur",
         "description": "",
         "responses": {
@@ -101,9 +97,7 @@
     },
     "/api/v1/users/me": {
       "get": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Récupérer les informations de l\\'utilisateur connecté",
         "description": "",
         "parameters": [
@@ -133,9 +127,7 @@
         ]
       },
       "patch": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Mettre à jour le profil utilisateur",
         "description": "",
         "parameters": [
@@ -187,9 +179,7 @@
     },
     "/api/v1/users/users": {
       "get": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Récupérer la liste de tous les utilisateurs",
         "description": "",
         "parameters": [

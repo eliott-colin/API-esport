@@ -4,7 +4,9 @@ module.exports = (req, res, next) => {
   try {
     const authorizationHeader = req.headers.authorization;
     if (!authorizationHeader) {
-      res.status(401).json({ message: "Pas de jetons d'authentification fourni" });
+      res
+        .status(401)
+        .json({ message: "Pas de jetons d'authentification fourni" });
     } else {
       // On split le token car il est composé de Bearer avant
       const token = req.headers.authorization.split(" ")[1];
