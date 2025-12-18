@@ -72,9 +72,26 @@ const getUserById = async (req, res) => {
   }
 };
 
+const deleteUser = async (req, res) => {
+  const role = req.auth.role;
+  if (role !== "admin") {
+    res.status(401).send({ status: "FAILED" });
+  }
+  const userId = req.params.id;
+  try {
+    const users = await usersService.deleteUser(userId);
+    res.status(200).json({ data: users });
+  } catch (error) {
+    res
+      .status(error?.status || 500)
+      .send({ status: "FAILED", data: { error: error?.message || error } });
+  }
+};
+
 module.exports = {
   getUserSelfDetails,
   updateUserDetails,
   getAllUsers,
   getUserById,
+  deleteUser,
 };

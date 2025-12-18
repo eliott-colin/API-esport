@@ -52,4 +52,13 @@ router.patch(
          #swagger.security = [{ "bearerAuth": [] }] */
 );
 
+router.delete(
+  "/:id/",
+  verifyToken,
+  usersController.deleteUser,
+  /* #swagger.tags = ['Users']
+        #swagger.summary = 'Supprimer les informations d'un utilisateur'
+        #swagger.security = [{ "bearerAuth": [] }] */
+);
+
 module.exports = router;

@@ -11,7 +11,7 @@ const User = {
       where: { id_user: 1 },
       data: data,
     }),
-  remove: (id) => prisma.users.delete({ where: { _id: Number(id) } }),
+  remove: (id) => prisma.users.delete({ where: { id_user: Number(id) } }),
 
   list: () => prisma.users.findMany(),
 };

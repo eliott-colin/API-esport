@@ -57,9 +57,18 @@ const getUserById = async (userId) => {
   }
 };
 
+const deleteUser = async (userId) => {
+  try {
+    await User.remove(userId);
+  } catch (error) {
+    throw { status: error?.status || 500, message: error?.message || error };
+  }
+};
+
 module.exports = {
   getUserSelfDetails,
   updateUserDetails,
   getAllUsers,
   getUserById,
+  deleteUser,
 };
