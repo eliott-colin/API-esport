@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
+const UserPermission = require("../models/UserPermission")
 const jwt = require("jsonwebtoken");
 const userRegistration = async (
   firstName,
@@ -19,7 +20,7 @@ const userRegistration = async (
       };
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    await User.create({
+    const user = await User.create({
       name: lastName,
       firstname: firstName,
       email: email,
@@ -27,6 +28,10 @@ const userRegistration = async (
       password: hashedPassword,
       Id_universities: idUniversities
     });
+    await UserPermission.create({
+      id_user: user.id_user,
+      id_role: 0
+    })
     const userAfterCreate = await User.findByEmail(email);
     return jwt.sign(
       {

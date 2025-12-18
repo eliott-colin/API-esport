@@ -24,7 +24,12 @@ const updateUserDetails = async (req, res) => {
     }
 }
 
+const getAllUsers = async (req, res) => {
+
+}
+
 module.exports = {
     getUserSelfDetails,
-    updateUserDetails
+    updateUserDetails,
+    getAllUsers,
 };
