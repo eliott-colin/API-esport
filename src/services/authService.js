@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
-const UserPermission = require("../models/UserPermission")
-const Permission = require("../models/Permission")
+const UserPermission = require("../models/UserPermission");
+const Permission = require("../models/Permission");
 const jwt = require("jsonwebtoken");
 const userRegistration = async (
   firstName,
@@ -27,13 +27,13 @@ const userRegistration = async (
       email: email,
       photo: photo,
       password: hashedPassword,
-      Id_universities: idUniversities
+      Id_universities: idUniversities,
     });
     const userPermissionDetails = await UserPermission.create({
       id_user: user.id_user,
-      Id_roles: 1
-    })
-    const role = await Permission.findById(userPermissionDetails.Id_roles)
+      Id_roles: 1,
+    });
+    const role = await Permission.findById(userPermissionDetails.Id_roles);
     const userAfterCreate = await User.findByEmail(email);
     return jwt.sign(
       {
@@ -54,8 +54,10 @@ const userRegistration = async (
 const userConnection = async (email, password) => {
   try {
     const user = await User.findByEmail(email);
-    const userPermissionDetails = await UserPermission.findByUserId(user[0].id_user)
-    const role = await Permission.findById(userPermissionDetails[0].Id_roles)
+    const userPermissionDetails = await UserPermission.findByUserId(
+      user[0].id_user,
+    );
+    const role = await Permission.findById(userPermissionDetails[0].Id_roles);
     if (user.length < 0) {
       throw {
         status: 401,
