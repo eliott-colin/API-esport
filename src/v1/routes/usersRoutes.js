@@ -42,4 +42,14 @@ router.get(
        #swagger.security = [{ "bearerAuth": [] }] */
 );
 
+router.patch(
+  "/:id/",
+  verifyToken,
+  usersController.updateUserDetails,
+  validator.body(updateUserSchema),
+  /* #swagger.tags = ['Users']
+         #swagger.summary = 'Mettre à jour les informations d'un utilisateur'
+         #swagger.security = [{ "bearerAuth": [] }] */
+);
+
 module.exports = router;

@@ -14,9 +14,26 @@ const getUserSelfDetails = async (req, res) => {
 const updateUserDetails = async (req, res) => {
   const { firstName, lastName, email } = req.body;
   const userId = req.auth.userId;
+  const adminUserId = req.params.id;
+  if (adminUserId) {
+    const role = req.auth.role;
+    if (role !== "admin") {
+      res.status(401).send({ status: "FAILED" });
+    }
+  }
   try {
-    await usersService.updateUserDetails(userId, firstName, lastName, email);
-    res.status(200).json({ ok: true });
+    if (adminUserId) {
+      await usersService.updateUserDetails(
+        adminUserId,
+        firstName,
+        lastName,
+        email,
+      );
+      res.status(200).json({ ok: true });
+    } else {
+      await usersService.updateUserDetails(userId, firstName, lastName, email);
+      res.status(200).json({ ok: true });
+    }
   } catch (error) {
     res
       .status(error?.status || 500)
