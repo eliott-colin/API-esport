@@ -17,7 +17,6 @@ describe("User Register", () => {
         idUniversities: 1
       });
     //THEN
-      console.log(response)
     expect(response.status).toBe(201);
     expect(response.body.token).toBeDefined();
   });

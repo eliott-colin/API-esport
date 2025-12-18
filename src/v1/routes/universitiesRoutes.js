@@ -6,7 +6,7 @@ const validator = require("express-joi-validation").createValidator({});
 const { updateUserSchema } = require("./validators");
 
 router.get(
-  "/universities",
+  "",
   verifyToken,
   universitiesController.getAllUniversities,
   /* #swagger.tags = ['Universities']
