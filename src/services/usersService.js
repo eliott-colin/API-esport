@@ -42,8 +42,24 @@ const getAllUsers = async () => {
   }
 };
 
+const getUserById = async (userId) => {
+  try {
+    const user = await User.findById(userId);
+    return {
+      id: user.id_user,
+      firstName: user.firstname,
+      lastName: user.name,
+      email: user.email,
+      photoUrl: user.photo ? `http://localhost:3000/${user.photo}.png` : null,
+    };
+  } catch (error) {
+    throw { status: error?.status || 500, message: error?.message || error };
+  }
+};
+
 module.exports = {
   getUserSelfDetails,
   updateUserDetails,
   getAllUsers,
+  getUserById,
 };
