@@ -14,9 +14,26 @@ const getUserSelfDetails = async (req, res) => {
 const updateUserDetails = async (req, res) => {
   const { firstName, lastName, email } = req.body;
   const userId = req.auth.userId;
+  const adminUserId = req.params.id;
+  if (adminUserId) {
+    const role = req.auth.role;
+    if (role !== "admin") {
+      res.status(401).send({ status: "FAILED" });
+    }
+  }
   try {
-    await usersService.updateUserDetails(userId, firstName, lastName, email);
-    res.status(200).json({ ok: true });
+    if (adminUserId) {
+      await usersService.updateUserDetails(
+        adminUserId,
+        firstName,
+        lastName,
+        email,
+      );
+      res.status(200).json({ ok: true });
+    } else {
+      await usersService.updateUserDetails(userId, firstName, lastName, email);
+      res.status(200).json({ ok: true });
+    }
   } catch (error) {
     res
       .status(error?.status || 500)
@@ -24,10 +41,57 @@ const updateUserDetails = async (req, res) => {
   }
 };
 
-const getAllUsers = async (req, res) => {};
+const getAllUsers = async (req, res) => {
+  const role = req.auth.role;
+  if (role !== "admin") {
+    res.status(401).send({ status: "FAILED" });
+  }
+  try {
+    const users = await usersService.getAllUsers();
+    res.status(200).json({ data: users });
+  } catch (error) {
+    res
+      .status(error?.status || 500)
+      .send({ status: "FAILED", data: { error: error?.message || error } });
+  }
+};
+
+const getUserById = async (req, res) => {
+  const role = req.auth.role;
+  if (role !== "admin") {
+    res.status(401).send({ status: "FAILED" });
+  }
+  const userId = req.params.id;
+  try {
+    const users = await usersService.getUserById(userId);
+    res.status(200).json({ data: users });
+  } catch (error) {
+    res
+      .status(error?.status || 500)
+      .send({ status: "FAILED", data: { error: error?.message || error } });
+  }
+};
+
+const deleteUser = async (req, res) => {
+  const role = req.auth.role;
+  if (role !== "admin") {
+    res.status(401).send({ status: "FAILED" });
+  }
+  const userId = req.params.id;
+  try {
+    const users = await usersService.deleteUser(userId);
+    res.status(200).json({ data: users });
+  } catch (error) {
+    res
+      .status(error?.status || 500)
+      .send({ status: "FAILED", data: { error: error?.message || error } });
+  }
+};
 
 module.exports = {
   getUserSelfDetails,
   updateUserDetails,
   getAllUsers,
+  getUserById,
+  deleteUser,
 };

@@ -25,12 +25,40 @@ router.patch(
 );
 
 router.get(
-  "/users",
+  "",
   verifyToken,
   usersController.getAllUsers,
   /* #swagger.tags = ['Users']
      #swagger.summary = 'Récupérer la liste de tous les utilisateurs'
      #swagger.security = [{ "bearerAuth": [] }] */
+);
+
+router.get(
+  "/:id/",
+  verifyToken,
+  usersController.getUserById,
+  /* #swagger.tags = ['Users']
+       #swagger.summary = 'Récupérer les informations d'un utilisateur'
+       #swagger.security = [{ "bearerAuth": [] }] */
+);
+
+router.patch(
+  "/:id/",
+  verifyToken,
+  usersController.updateUserDetails,
+  validator.body(updateUserSchema),
+  /* #swagger.tags = ['Users']
+         #swagger.summary = 'Mettre à jour les informations d'un utilisateur'
+         #swagger.security = [{ "bearerAuth": [] }] */
+);
+
+router.delete(
+  "/:id/",
+  verifyToken,
+  usersController.deleteUser,
+  /* #swagger.tags = ['Users']
+        #swagger.summary = 'Supprimer les informations d'un utilisateur'
+        #swagger.security = [{ "bearerAuth": [] }] */
 );
 
 module.exports = router;

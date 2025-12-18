@@ -7,12 +7,20 @@ const Permission = require("../../../src/models/Permission");
 const UserPermission = require("../../../src/models/UserPermission");
 const prisma = new PrismaClient();
 
-describe("User's details update", () => {
-    it("should update connected user details", async () => {
+describe("Admin delete user", () => {
+    it("should remove user from db", async () => {
         //GIVEN
         const password = "test";
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user =await User.create({
+        await User.create({
+            name: "User TO",
+            firstname: "Test Delete",
+            email: "testdelete@gmail.com",
+            photo: "0753904650",
+            password: hashedPassword,
+            Id_universities: 1
+        });
+        const user = await User.create({
             name: "User",
             firstname: "Test",
             email: "test@gmail.com",
@@ -20,7 +28,7 @@ describe("User's details update", () => {
             password: hashedPassword,
             Id_universities: 1
         });
-        const role = await Permission.findByName("user")
+        const role = await Permission.findByName("admin")
         await UserPermission.create({id_user: user.id_user, Id_roles: role.Id_roles})
         const responseToken = await request(app)
             .post("/api/v1/auth/login")
@@ -32,17 +40,11 @@ describe("User's details update", () => {
         const token= responseToken.body.token
         //WHEN
         const response = await request(app)
-            .patch("/api/v1/users/me")
+            .delete("/api/v1/users/1")
             .set("Authorization", `Bearer ${token}`)
-            .set("content-type", "application/json")
-            .send({
-                firstName: "Lol",
-                lastName: "User",
-                email: "test@gmail.com"
-            })
         //THEN
         expect(response.status).toBe(200);
         const userResult = await User.findById(1)
-        expect(userResult.firstname).toBe("Lol")
+        expect(userResult).toBeNull()
     });
 });

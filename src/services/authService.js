@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
 const UserPermission = require("../models/UserPermission");
+const Permission = require("../models/Permission");
 const jwt = require("jsonwebtoken");
 const userRegistration = async (
   firstName,
@@ -28,16 +29,17 @@ const userRegistration = async (
       password: hashedPassword,
       Id_universities: idUniversities,
     });
-    await UserPermission.create({
+    const userPermissionDetails = await UserPermission.create({
       id_user: user.id_user,
-      id_role: 0,
+      Id_roles: 1,
     });
+    const role = await Permission.findById(userPermissionDetails.Id_roles);
     const userAfterCreate = await User.findByEmail(email);
     return jwt.sign(
       {
         userId: userAfterCreate.id,
         name: userAfterCreate.nom,
-        role: "default",
+        role: role.name,
       },
       process.env.JWT_KEY,
       {
@@ -52,6 +54,10 @@ const userRegistration = async (
 const userConnection = async (email, password) => {
   try {
     const user = await User.findByEmail(email);
+    const userPermissionDetails = await UserPermission.findByUserId(
+      user[0].id_user,
+    );
+    const role = await Permission.findById(userPermissionDetails[0].Id_roles);
     if (user.length < 0) {
       throw {
         status: 401,
@@ -63,7 +69,7 @@ const userConnection = async (email, password) => {
       throw { status: 401, error: "Authentication failed, wrong password!" };
     }
     return jwt.sign(
-      { userId: user[0].id_user, name: user[0].name, role: "default" },
+      { userId: user[0].id_user, name: user[0].name, role: role.name },
       process.env.JWT_KEY,
       {
         expiresIn: "60m",

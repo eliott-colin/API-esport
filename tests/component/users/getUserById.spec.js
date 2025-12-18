@@ -1,18 +1,25 @@
 const request = require("supertest");
 const app = require("../../../src");
 const User = require("../../../src/models/User");
-const bcrypt = require("bcrypt");
-const { PrismaClient } = require("@prisma/client");
-const Permission = require("../../../src/models/Permission");
-const UserPermission = require("../../../src/models/UserPermission");
-const prisma = new PrismaClient();
+const UserPermission = require("../../../src/models/UserPermission")
+const Permission = require("../../../src/models/Permission")
 
-describe("User's details update", () => {
-    it("should update connected user details", async () => {
+const bcrypt = require("bcrypt");
+
+describe("Get an user by id", () => {
+    it("should get one user", async () => {
         //GIVEN
         const password = "test";
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user =await User.create({
+        await User.create({
+            name: "User Test",
+            firstname: "Test right",
+            email: "testuser@gmail.com",
+            photo: "0753904651",
+            password: hashedPassword,
+            Id_universities: 1
+        });
+        const user = await User.create({
             name: "User",
             firstname: "Test",
             email: "test@gmail.com",
@@ -20,7 +27,7 @@ describe("User's details update", () => {
             password: hashedPassword,
             Id_universities: 1
         });
-        const role = await Permission.findByName("user")
+        const role = await Permission.findByName("admin")
         await UserPermission.create({id_user: user.id_user, Id_roles: role.Id_roles})
         const responseToken = await request(app)
             .post("/api/v1/auth/login")
@@ -32,17 +39,16 @@ describe("User's details update", () => {
         const token= responseToken.body.token
         //WHEN
         const response = await request(app)
-            .patch("/api/v1/users/me")
+            .get("/api/v1/users/1")
             .set("Authorization", `Bearer ${token}`)
-            .set("content-type", "application/json")
-            .send({
-                firstName: "Lol",
-                lastName: "User",
-                email: "test@gmail.com"
-            })
         //THEN
         expect(response.status).toBe(200);
-        const userResult = await User.findById(1)
-        expect(userResult.firstname).toBe("Lol")
+        expect(response.body.data).toMatchObject({
+            id: 1,
+            lastName: "User Test",
+            firstName: "Test right",
+            email: "testuser@gmail.com",
+            photoUrl: "http://localhost:3000/0753904651.png"
+        })
     });
 });
