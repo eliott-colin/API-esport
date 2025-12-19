@@ -3,13 +3,13 @@
 ## 🧩 API / Backend
 
 * [x] Définir les endpoints
-* [ ] Implémenter **tous** les endpoints (en cours)
-* [ ] Lier l’ensemble des routes aux controllers
-* [ ] Mettre en place les validations
-* [ ] Gérer les erreurs et les status codes HTTP
 * [x] Mettre en place le serveur backend (Node.js + Express)
 * [x] Configuration de l’environnement (`.env` + dotenv)
 * [x] Mise en place du reverse proxy (Nginx → Node.js)
+* [x] Gérer les erreurs et les status codes HTTP
+* [ ] Implémenter **tous** les endpoints (en cours)
+* [ ] Lier l’ensemble des routes aux controllers
+* [ ] Mettre en place les validations
 
 ---
 
@@ -51,7 +51,7 @@
 * ✅ Base de données **opérationnelle** et connectée
 * ❌ Frontend **non commencé**
 
-**Avancement estimé : ~60 % (hors frontend)**
+**Avancement estimé : ~80 % (hors frontend)**
 
 ---
 
