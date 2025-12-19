@@ -1,10 +1,9 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const prisma = require("../v1/prisma");
 
 const Universities = {
   findById: (id) =>
-    prisma.universities.findUnique({ where: { id_university: Number(id) } }),
-  list: () => prisma.universities.findMany(),
+    prisma.universities.findUnique({ where: { Id_universities: Number(id) } }),
+  findAll: () => prisma.universities.findMany(),
 };
 
 module.exports = Universities;

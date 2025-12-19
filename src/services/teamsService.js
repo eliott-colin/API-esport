@@ -2,6 +2,10 @@ const Team = require("../models/Team");
 
 const updateTeamDetails = async (teamId, name) => {
   try {
+    const team = await Team.findById(teamId);
+    if (!team) {
+      throw { status: 404, message: "Équipe non trouvée" };
+    }
     await Team.update(teamId, {
       name: name,
     });
@@ -26,6 +30,9 @@ const getAllTeams = async () => {
 const getTeamById = async (teamId) => {
   try {
     const team = await Team.findById(teamId);
+    if (!team) {
+      throw { status: 404, message: "Équipe non trouvée" };
+    }
     return {
       id: team.Id_teams,
       name: team.name,
@@ -38,6 +45,10 @@ const getTeamById = async (teamId) => {
 
 const deleteTeam = async (teamId) => {
   try {
+    const team = await Team.findById(teamId);
+    if (!team) {
+      throw { status: 404, message: "Équipe non trouvée" };
+    }
     await Team.remove(teamId);
   } catch (error) {
     throw { status: error?.status || 500, message: error?.message || error };

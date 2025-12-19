@@ -1,54 +1,57 @@
 const request = require("supertest");
 const app = require("../../../src");
-const User = require("../../../src/models/User");
-const UserPermission = require("../../../src/models/UserPermission")
-const Permission = require("../../../src/models/Permission")
+const { createAdminUser, createNormalUser } = require("../../utils/testHelpers");
 
-const bcrypt = require("bcrypt");
+describe("Utilisateurs - Détails par ID (Admin)", () => {
+  describe("GET /api/v1/users/:id", () => {
+    it("devrait récupérer un utilisateur par son ID (admin)", async () => {
+      // GIVEN
+      const { user: targetUser } = await createNormalUser({
+        name: "Target",
+        firstname: "User",
+        email: "target@test.com",
+      });
+      const { token } = await createAdminUser();
 
-describe("Get an user by id", () => {
-    it("should get one user", async () => {
-        //GIVEN
-        const password = "test";
-        const hashedPassword = await bcrypt.hash(password, 10);
-        await User.create({
-            name: "User Test",
-            firstname: "Test right",
-            email: "testuser@gmail.com",
-            photo: "0753904651",
-            password: hashedPassword,
-            Id_universities: 1
-        });
-        const user = await User.create({
-            name: "User",
-            firstname: "Test",
-            email: "test@gmail.com",
-            photo: "0753904652",
-            password: hashedPassword,
-            Id_universities: 1
-        });
-        const role = await Permission.findByName("admin")
-        await UserPermission.create({id_user: user.id_user, Id_roles: role.Id_roles})
-        const responseToken = await request(app)
-            .post("/api/v1/auth/login")
-            .set("content-type", "application/json")
-            .send({
-                email: "test@gmail.com",
-                password: "test",
-            });
-        const token= responseToken.body.token
-        //WHEN
-        const response = await request(app)
-            .get("/api/v1/users/1")
-            .set("Authorization", `Bearer ${token}`)
-        //THEN
-        expect(response.status).toBe(200);
-        expect(response.body.data).toMatchObject({
-            id: 1,
-            lastName: "User Test",
-            firstName: "Test right",
-            email: "testuser@gmail.com",
-            photoUrl: "http://localhost:3000/0753904651.png"
-        })
+      // WHEN
+      const response = await request(app)
+        .get(`/api/v1/users/${targetUser.id_user}`)
+        .set("Authorization", `Bearer ${token}`);
+
+      // THEN
+      expect(response.status).toBe(200);
+      expect(response.body.data).toMatchObject({
+        id: targetUser.id_user,
+        firstName: "User",
+        lastName: "Target",
+        email: "target@test.com",
+      });
     });
+
+    it("should reject access for non-admin user", async () => {
+      // GIVEN
+      const { token } = await createNormalUser();
+
+      // WHEN
+      const response = await request(app)
+        .get("/api/v1/users/1")
+        .set("Authorization", `Bearer ${token}`);
+
+      // THEN
+      expect(response.status).toBe(403);
+    });
+
+    it("should return 404 for non-existent user", async () => {
+      // GIVEN
+      const { token } = await createAdminUser();
+
+      // WHEN
+      const response = await request(app)
+        .get("/api/v1/users/999999")
+        .set("Authorization", `Bearer ${token}`);
+
+      // THEN
+      expect(response.status).toBe(404);
+    });
+  });
 });

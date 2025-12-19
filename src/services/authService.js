@@ -25,7 +25,7 @@ const userRegistration = async (
       name: lastName,
       firstname: firstName,
       email: email,
-      photo: imagePath+".png",
+      photo: imagePath ? imagePath : null,
       password: hashedPassword,
       Id_universities: Number(idUniversities),
     });
@@ -34,11 +34,10 @@ const userRegistration = async (
       Id_roles: 1,
     });
     const role = await Permission.findById(userPermissionDetails.Id_roles);
-    const userAfterCreate = await User.findByEmail(email);
     return jwt.sign(
       {
-        userId: userAfterCreate.id,
-        name: userAfterCreate.nom,
+        userId: user.id_user,
+        name: user.name,
         role: role.name,
       },
       process.env.JWT_KEY,
@@ -54,19 +53,19 @@ const userRegistration = async (
 const userConnection = async (email, password) => {
   try {
     const user = await User.findByEmail(email);
+    if (!user || user.length === 0) {
+      throw {
+        status: 401,
+        message: "Authentication failed, user does not exist!",
+      };
+    }
     const userPermissionDetails = await UserPermission.findByUserId(
       user[0].id_user,
     );
     const role = await Permission.findById(userPermissionDetails[0].Id_roles);
-    if (user.length < 0) {
-      throw {
-        status: 401,
-        error: "Authentication failed, user does not exist!",
-      };
-    }
     const passwordMatch = await bcrypt.compare(password, user[0].password);
     if (!passwordMatch) {
-      throw { status: 401, error: "Authentication failed, wrong password!" };
+      throw { status: 401, message: "Authentication failed, wrong password!" };
     }
     return jwt.sign(
       { userId: user[0].id_user, name: user[0].name, role: role.name },

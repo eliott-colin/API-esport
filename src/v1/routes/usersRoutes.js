@@ -3,7 +3,7 @@ const verifyToken = require("../../middleware/authMiddleware");
 const usersController = require("../../controllers/usersController");
 const router = express.Router();
 const validator = require("express-joi-validation").createValidator({});
-const { updateUserSchema } = require("./validators");
+const { updateUserSchema, idParamSchema } = require("./validators");
 
 router.get(
   "/me",
@@ -36,6 +36,7 @@ router.get(
 router.get(
   "/:id/",
   verifyToken,
+  validator.params(idParamSchema),
   usersController.getUserById,
   /* #swagger.tags = ['Users']
        #swagger.summary = 'Récupérer les informations d'un utilisateur'
@@ -45,8 +46,9 @@ router.get(
 router.patch(
   "/:id/",
   verifyToken,
-  usersController.updateUserDetails,
+  validator.params(idParamSchema),
   validator.body(updateUserSchema),
+  usersController.updateUserDetails,
   /* #swagger.tags = ['Users']
          #swagger.summary = 'Mettre à jour les informations d'un utilisateur'
          #swagger.security = [{ "bearerAuth": [] }] */
@@ -55,6 +57,7 @@ router.patch(
 router.delete(
   "/:id/",
   verifyToken,
+  validator.params(idParamSchema),
   usersController.deleteUser,
   /* #swagger.tags = ['Users']
         #swagger.summary = 'Supprimer les informations d'un utilisateur'

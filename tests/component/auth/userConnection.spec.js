@@ -1,34 +1,56 @@
 const request = require("supertest");
 const app = require("../../../src");
-const User = require("../../../src/models/User");
-const bcrypt = require("bcrypt");
+const { createNormalUser } = require("../../utils/testHelpers");
 
-describe("User Connection", () => {
-  it("should connect the user", async () => {
-    //GIVEN
-    const password = "test";
-    await request(app)
-        .post("/api/v1/auth/register")
-        .set("content-type", "application/json")
+describe("Authentification - Connexion", () => {
+  describe("POST /api/v1/auth/login", () => {
+    it("devrait connecter un utilisateur avec des identifiants valides", async () => {
+      // GIVEN - Créer un utilisateur
+      const email = "login.test@test.com";
+      const password = "password123";
+      await createNormalUser({ email, password });
+
+      // WHEN
+      const response = await request(app)
+        .post("/api/v1/auth/login")
+        .send({ email, password });
+
+      // THEN
+      expect(response.status).toBe(200);
+      expect(response.body.token).toBeDefined();
+      expect(typeof response.body.token).toBe("string");
+    });
+
+    it("should reject login with non-existent email", async () => {
+      // WHEN
+      const response = await request(app)
+        .post("/api/v1/auth/login")
         .send({
-          firstName: "Test",
-          lastName: "User",
-          email: "test@gmail.com",
-          photo: "0753904652",
-          password: "test",
-          idUniversities: 1
+          email: "inexistant@test.com",
+          password: "password123",
         });
 
-    //WHEN
-    const response = await request(app)
-      .post("/api/v1/auth/login")
-      .set("content-type", "application/json")
-      .send({
-        email: "test@gmail.com",
-        password: "test",
-      });
-    //THEN
-    expect(response.status).toBe(200);
-    expect(response.body.token).toBeDefined();
+      // THEN
+      expect(response.status).toBe(401);
+      expect(response.body.data.error).toBeDefined();
+    });
+
+    it("should reject login with wrong password", async () => {
+      // GIVEN
+      const email = "wrong.password@test.com";
+      await createNormalUser({ email, password: "correctpassword" });
+
+      // WHEN
+      const response = await request(app)
+        .post("/api/v1/auth/login")
+        .send({
+          email,
+          password: "wrongpassword",
+        });
+
+      // THEN
+      expect(response.status).toBe(401);
+      expect(response.body.data.error).toBeDefined();
+    });
   });
 });

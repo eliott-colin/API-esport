@@ -1,11 +1,10 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const prisma = require("../v1/prisma");
 
 const Events = {
-    create: (data) => prisma.events.create({ data }),
+  create: (data) => prisma.events.create({ data }),
   findById: (id) =>
     prisma.events.findUnique({ where: { Id_event: Number(id) } }),
-  list: () => prisma.events.findMany(),
+  findAll: () => prisma.events.findMany(),
 };
 
 
