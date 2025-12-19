@@ -1,48 +1,52 @@
 const request = require("supertest");
 const app = require("../../../src");
 const User = require("../../../src/models/User");
-const bcrypt = require("bcrypt");
-const { PrismaClient } = require("@prisma/client");
-const Permission = require("../../../src/models/Permission");
-const UserPermission = require("../../../src/models/UserPermission");
-const prisma = new PrismaClient();
+const { createNormalUser } = require("../../utils/testHelpers");
 
-describe("User's details update", () => {
-    it("should update connected user details", async () => {
-        //GIVEN
-        const password = "test";
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user =await User.create({
-            name: "User",
-            firstname: "Test",
-            email: "test@gmail.com",
-            photo: "0753904652",
-            password: hashedPassword,
-            Id_universities: 1
-        });
-        const role = await Permission.findByName("user")
-        await UserPermission.create({id_user: user.id_user, Id_roles: role.Id_roles})
-        const responseToken = await request(app)
-            .post("/api/v1/auth/login")
-            .set("content-type", "application/json")
-            .send({
-                email: "test@gmail.com",
-                password: "test",
-            });
-        const token= responseToken.body.token
-        //WHEN
-        const response = await request(app)
-            .patch("/api/v1/users/me")
-            .set("Authorization", `Bearer ${token}`)
-            .set("content-type", "application/json")
-            .send({
-                firstName: "Lol",
-                lastName: "User",
-                email: "test@gmail.com"
-            })
-        //THEN
-        expect(response.status).toBe(200);
-        const userResult = await User.findById(1)
-        expect(userResult.firstname).toBe("Lol")
+describe("Users - Profile Update", () => {
+  describe("PATCH /api/v1/users/me", () => {
+    it("should update authenticated user information", async () => {
+      // GIVEN
+      const { user, token } = await createNormalUser({
+        firstname: "Ancien",
+        name: "Nom",
+        email: "ancien@test.com",
+      });
+
+      const updatedData = {
+        firstName: "Nouveau",
+        lastName: "Prénom",
+        email: "nouveau@test.com",
+      };
+
+      // WHEN
+      const response = await request(app)
+        .patch("/api/v1/users/me")
+        .set("Authorization", `Bearer ${token}`)
+        .send(updatedData);
+
+      // THEN
+      expect(response.status).toBe(200);
+      expect(response.body.ok).toBe(true);
+
+      const userResult = await User.findById(user.id_user);
+      expect(userResult.firstname).toBe(updatedData.firstName);
+      expect(userResult.name).toBe(updatedData.lastName);
+      expect(userResult.email).toBe(updatedData.email);
     });
+
+    it("should reject update without authentication", async () => {
+      // WHEN
+      const response = await request(app)
+        .patch("/api/v1/users/me")
+        .send({
+          firstName: "Test",
+          lastName: "Test",
+          email: "test@test.com",
+        });
+
+      // THEN
+      expect(response.status).toBe(401);
+    });
+  });
 });

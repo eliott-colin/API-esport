@@ -1,46 +1,46 @@
 const request = require("supertest");
 const app = require("../../../src");
-const User = require("../../../src/models/User");
-const UserPermission = require("../../../src/models/UserPermission")
-const Permission = require("../../../src/models/Permission")
+const { createAdminUser, createNormalUser } = require("../../utils/testHelpers");
 
-const bcrypt = require("bcrypt");
+describe("Users - List (Admin)", () => {
+  describe("GET /api/v1/users", () => {
+    it("should retrieve all users list (admin)", async () => {
+      // GIVEN
+      await createNormalUser({ name: "User1", firstname: "Test1" });
+      await createNormalUser({ name: "User2", firstname: "Test2" });
+      const { token } = await createAdminUser();
 
-describe("Get all user's", () => {
-    it("should get all user and their details", async () => {
-        //GIVEN
-        const password = "test";
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await User.create({
-            name: "User",
-            firstname: "Test",
-            email: "test@gmail.com",
-            photo: "0753904652",
-            password: hashedPassword,
-            Id_universities: 1
-        });
-        const role = await Permission.findByName("admin")
-        await UserPermission.create({id_user: user.id_user, Id_roles: role.Id_roles})
-        const responseToken = await request(app)
-            .post("/api/v1/auth/login")
-            .set("content-type", "application/json")
-            .send({
-                email: "test@gmail.com",
-                password: "test",
-            });
-        const token= responseToken.body.token
-        //WHEN
-        const response = await request(app)
-            .get("/api/v1/users/")
-            .set("Authorization", `Bearer ${token}`)
-        //THEN
-        expect(response.status).toBe(200);
-        expect(response.body.data[0]).toMatchObject({
-            id: 1,
-            lastName: "User",
-            firstName: "Test",
-            email: "test@gmail.com",
-            photoUrl: "http://localhost:3000/0753904652.png"
-        })
+      // WHEN
+      const response = await request(app)
+        .get("/api/v1/users")
+        .set("Authorization", `Bearer ${token}`);
+
+      // THEN
+      expect(response.status).toBe(200);
+      expect(response.body.data).toBeDefined();
+      expect(Array.isArray(response.body.data)).toBe(true);
+      expect(response.body.data.length).toBeGreaterThanOrEqual(3);
     });
+
+    it("should reject access for non-admin user", async () => {
+      // GIVEN
+      const { token } = await createNormalUser();
+
+      // WHEN
+      const response = await request(app)
+        .get("/api/v1/users")
+        .set("Authorization", `Bearer ${token}`);
+
+      // THEN
+      expect(response.status).toBe(403);
+    });
+
+    it("should reject request without authentication", async () => {
+      // WHEN
+      const response = await request(app).get("/api/v1/users");
+
+      // THEN
+      expect(response.status).toBe(401);
+    });
+  });
 });

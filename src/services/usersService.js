@@ -3,6 +3,9 @@ const User = require("../models/User");
 const getUserSelfDetails = async (userId) => {
   try {
     const user = await User.findById(userId);
+    if (!user) {
+      throw { status: 404, message: "Utilisateur non trouvé" };
+    }
     return {
       id: user.id_user,
       name: user.name,
@@ -17,6 +20,10 @@ const getUserSelfDetails = async (userId) => {
 
 const updateUserDetails = async (userId, firstName, lastName, email) => {
   try {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw { status: 404, message: "Utilisateur non trouvé" };
+    }
     await User.update(userId, {
       firstname: firstName,
       name: lastName,
@@ -45,6 +52,9 @@ const getAllUsers = async () => {
 const getUserById = async (userId) => {
   try {
     const user = await User.findById(userId);
+    if (!user) {
+      throw { status: 404, message: "Utilisateur non trouvé" };
+    }
     return {
       id: user.id_user,
       firstName: user.firstname,
@@ -59,6 +69,10 @@ const getUserById = async (userId) => {
 
 const deleteUser = async (userId) => {
   try {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw { status: 404, message: "Utilisateur non trouvé" };
+    }
     await User.remove(userId);
   } catch (error) {
     throw { status: error?.status || 500, message: error?.message || error };

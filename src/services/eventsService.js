@@ -2,15 +2,19 @@ const Events = require("../models/Events");
 
 const getAllEvents = async () => {
   try {
-    return await Events.list();
-    } catch (error) {
+    return await Events.findAll();
+  } catch (error) {
     throw { status: error?.status || 500, message: error?.message || error };
-    }
+  }
 };
 
 const getEventById = async (id) => {
   try {
-    return await Events.findById(id);
+    const event = await Events.findById(id);
+    if (!event) {
+      throw { status: 404, message: "Événement non trouvé" };
+    }
+    return event;
   } catch (error) {
     throw { status: error?.status || 500, message: error?.message || error };
   }

@@ -1,50 +1,60 @@
 const request = require("supertest");
 const app = require("../../../src");
 const User = require("../../../src/models/User");
-const bcrypt = require("bcrypt");
-const { PrismaClient } = require("@prisma/client");
-const Permission = require("../../../src/models/Permission");
 const UserPermission = require("../../../src/models/UserPermission");
-const prisma = new PrismaClient();
+const prisma = require("../../../src/v1/prisma");
+const { createAdminUser, createNormalUser } = require("../../utils/testHelpers");
 
-describe("Admin delete user", () => {
-    it("should remove user from db", async () => {
-        //GIVEN
-        const password = "test";
-        const hashedPassword = await bcrypt.hash(password, 10);
-        await User.create({
-            name: "User TO",
-            firstname: "Test Delete",
-            email: "testdelete@gmail.com",
-            photo: "0753904650",
-            password: hashedPassword,
-            Id_universities: 1
-        });
-        const user = await User.create({
-            name: "User",
-            firstname: "Test",
-            email: "test@gmail.com",
-            photo: "0753904652",
-            password: hashedPassword,
-            Id_universities: 1
-        });
-        const role = await Permission.findByName("admin")
-        await UserPermission.create({id_user: user.id_user, Id_roles: role.Id_roles})
-        const responseToken = await request(app)
-            .post("/api/v1/auth/login")
-            .set("content-type", "application/json")
-            .send({
-                email: "test@gmail.com",
-                password: "test",
-            });
-        const token= responseToken.body.token
-        //WHEN
-        const response = await request(app)
-            .delete("/api/v1/users/1")
-            .set("Authorization", `Bearer ${token}`)
-        //THEN
-        expect(response.status).toBe(200);
-        const userResult = await User.findById(1)
-        expect(userResult).toBeNull()
+describe("Utilisateurs - Suppression par Admin", () => {
+  describe("DELETE /api/v1/users/:id", () => {
+    it("devrait supprimer un utilisateur de la base de données (admin)", async () => {
+      // GIVEN
+      const { user: targetUser } = await createNormalUser({
+        email: "todelete@test.com",
+      });
+      const { token } = await createAdminUser();
+
+      // Supprimer les permissions d'abord (contrainte FK)
+      await prisma.userPermissions.deleteMany({
+        where: { id_user: targetUser.id_user },
+      });
+
+      // WHEN
+      const response = await request(app)
+        .delete(`/api/v1/users/${targetUser.id_user}`)
+        .set("Authorization", `Bearer ${token}`);
+
+      // THEN
+      expect(response.status).toBe(204);
+      const userResult = await User.findById(targetUser.id_user);
+      expect(userResult).toBeNull();
     });
+
+    it("should reject deletion if user is not admin", async () => {
+      // GIVEN
+      const { user: targetUser } = await createNormalUser();
+      const { token } = await createNormalUser();
+
+      // WHEN
+      const response = await request(app)
+        .delete(`/api/v1/users/${targetUser.id_user}`)
+        .set("Authorization", `Bearer ${token}`);
+
+      // THEN
+      expect(response.status).toBe(403);
+    });
+
+    it("should return 404 for non-existent user", async () => {
+      // GIVEN
+      const { token } = await createAdminUser();
+
+      // WHEN
+      const response = await request(app)
+        .delete("/api/v1/users/999999")
+        .set("Authorization", `Bearer ${token}`);
+
+      // THEN
+      expect(response.status).toBe(404);
+    });
+  });
 });

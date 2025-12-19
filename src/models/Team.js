@@ -1,5 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const prisma = require("../v1/prisma");
 
 const Team = {
   create: (data) => prisma.teams.create({ data }),
@@ -8,11 +7,10 @@ const Team = {
   findAll: () => prisma.teams.findMany(),
   update: (id, data) =>
     prisma.teams.update({
-      where: { Id_teams: 1 },
+      where: { Id_teams: Number(id) },
       data: data,
     }),
   remove: (id) => prisma.teams.delete({ where: { Id_teams: Number(id) } }),
-  list: () => prisma.teams.findMany(),
 };
 
 module.exports = Team;

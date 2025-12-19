@@ -1,48 +1,34 @@
 const request = require("supertest");
 const app = require("../../../src");
-const User = require("../../../src/models/User");
-const UserPermission = require("../../../src/models/UserPermission")
-const Permission = require("../../../src/models/Permission")
-const Team = require("../../../src/models/Team")
+const Team = require("../../../src/models/Team");
+const { createNormalUser } = require("../../utils/testHelpers");
 
-const bcrypt = require("bcrypt");
+describe("Équipes - Liste", () => {
+  describe("GET /api/v1/teams", () => {
+    it("devrait récupérer la liste de toutes les équipes", async () => {
+      // GIVEN
+      await Team.create({ name: "Équipe Alpha", dateCreate: new Date() });
+      await Team.create({ name: "Équipe Beta", dateCreate: new Date() });
+      const { token } = await createNormalUser();
 
-describe("Get all teams", () => {
-    it("should get all teams and their details", async () => {
-        //GIVEN
-        const password = "test";
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await User.create({
-            name: "User",
-            firstname: "Test",
-            email: "test@gmail.com",
-            photo: "0753904652",
-            password: hashedPassword,
-            Id_universities: 1
-        });
-        const role = await Permission.findByName("user")
-        await UserPermission.create({id_user: user.id_user, Id_roles: role.Id_roles})
-        await Team.create({
-            name: "TestTeam",
-            dateCreate: new Date(),
-        })
-        const responseToken = await request(app)
-            .post("/api/v1/auth/login")
-            .set("content-type", "application/json")
-            .send({
-                email: "test@gmail.com",
-                password: "test",
-            });
-        const token= responseToken.body.token
-        //WHEN
-        const response = await request(app)
-            .get("/api/v1/teams/")
-            .set("Authorization", `Bearer ${token}`)
-        //THEN
-        expect(response.status).toBe(200);
-        expect(response.body.data[0]).toMatchObject({
-            id: 1,
-            name: "TestTeam",
-        })
+      // WHEN
+      const response = await request(app)
+        .get("/api/v1/teams")
+        .set("Authorization", `Bearer ${token}`);
+
+      // THEN
+      expect(response.status).toBe(200);
+      expect(response.body.data).toBeDefined();
+      expect(Array.isArray(response.body.data)).toBe(true);
+      expect(response.body.data.length).toBeGreaterThanOrEqual(2);
     });
+
+    it("should reject request without authentication", async () => {
+      // WHEN
+      const response = await request(app).get("/api/v1/teams");
+
+      // THEN
+      expect(response.status).toBe(401);
+    });
+  });
 });

@@ -1,46 +1,48 @@
 const request = require("supertest");
 const app = require("../../../src");
-const User = require("../../../src/models/User");
-const bcrypt = require("bcrypt");
-const { PrismaClient } = require("@prisma/client");
-const Permission = require("../../../src/models/Permission");
-const UserPermission = require("../../../src/models/UserPermission");
-const Team = require("../../../src/models/Team")
+const Team = require("../../../src/models/Team");
+const { createNormalUser } = require("../../utils/testHelpers");
 
-describe("Delete team", () => {
-    it("should remove team from db", async () => {
-        //GIVEN
-        const password = "test";
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await User.create({
-            name: "User",
-            firstname: "Test",
-            email: "test@gmail.com",
-            photo: "0753904652",
-            password: hashedPassword,
-            Id_universities: 1
-        });
-        const role = await Permission.findByName("admin")
-        await UserPermission.create({id_user: user.id_user, Id_roles: role.Id_roles})
-        const responseToken = await request(app)
-            .post("/api/v1/auth/login")
-            .set("content-type", "application/json")
-            .send({
-                email: "test@gmail.com",
-                password: "test",
-            });
-        const token= responseToken.body.token
-        await Team.create({
-            name: "User TO",
-            dateCreate: new Date()
-        });
-        //WHEN
-        const response = await request(app)
-            .delete("/api/v1/teams/1")
-            .set("Authorization", `Bearer ${token}`)
-        //THEN
-        expect(response.status).toBe(200);
-        const testResult = await Team.findById(1)
-        expect(testResult).toBeNull()
+describe("Équipes - Suppression", () => {
+  describe("DELETE /api/v1/teams/:id", () => {
+    it("devrait supprimer une équipe de la base de données", async () => {
+      // GIVEN
+      const team = await Team.create({
+        name: "Équipe à supprimer",
+        dateCreate: new Date(),
+      });
+      const { token } = await createNormalUser();
+
+      // WHEN
+      const response = await request(app)
+        .delete(`/api/v1/teams/${team.Id_teams}`)
+        .set("Authorization", `Bearer ${token}`);
+
+      // THEN
+      expect(response.status).toBe(204);
+      const testResult = await Team.findById(team.Id_teams);
+      expect(testResult).toBeNull();
     });
+
+    it("devrait retourner 404 pour une équipe inexistante", async () => {
+      // GIVEN
+      const { token } = await createNormalUser();
+
+      // WHEN
+      const response = await request(app)
+        .delete("/api/v1/teams/999999")
+        .set("Authorization", `Bearer ${token}`);
+
+      // THEN
+      expect(response.status).toBe(404);
+    });
+
+    it("should reject request without authentication", async () => {
+      // WHEN
+      const response = await request(app).delete("/api/v1/teams/1");
+
+      // THEN
+      expect(response.status).toBe(401);
+    });
+  });
 });

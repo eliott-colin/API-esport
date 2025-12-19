@@ -18,7 +18,9 @@ const updateUserDetails = async (req, res) => {
   if (adminUserId) {
     const role = req.auth.role;
     if (role !== "admin") {
-      res.status(401).send({ status: "FAILED" });
+      return res
+        .status(403)
+        .json({ status: "FAILED", message: "Forbidden: Admin access required" });
     }
   }
   try {
@@ -44,7 +46,9 @@ const updateUserDetails = async (req, res) => {
 const getAllUsers = async (req, res) => {
   const role = req.auth.role;
   if (role !== "admin") {
-    res.status(401).send({ status: "FAILED" });
+    return res
+      .status(403)
+      .json({ status: "FAILED", message: "Forbidden: Admin access required" });
   }
   try {
     const users = await usersService.getAllUsers();
@@ -59,7 +63,9 @@ const getAllUsers = async (req, res) => {
 const getUserById = async (req, res) => {
   const role = req.auth.role;
   if (role !== "admin") {
-    res.status(401).send({ status: "FAILED" });
+    return res
+      .status(403)
+      .json({ status: "FAILED", message: "Forbidden: Admin access required" });
   }
   const userId = req.params.id;
   try {
@@ -75,12 +81,14 @@ const getUserById = async (req, res) => {
 const deleteUser = async (req, res) => {
   const role = req.auth.role;
   if (role !== "admin") {
-    res.status(401).send({ status: "FAILED" });
+    return res
+      .status(403)
+      .json({ status: "FAILED", message: "Forbidden: Admin access required" });
   }
   const userId = req.params.id;
   try {
-    const users = await usersService.deleteUser(userId);
-    res.status(200).json({ data: users });
+    await usersService.deleteUser(userId);
+    res.status(204).send();
   } catch (error) {
     res
       .status(error?.status || 500)

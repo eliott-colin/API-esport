@@ -1,51 +1,56 @@
 const request = require("supertest");
 const app = require("../../../src");
-const User = require("../../../src/models/User");
-const bcrypt = require("bcrypt");
-const { PrismaClient } = require("@prisma/client");
-const Permission = require("../../../src/models/Permission");
-const UserPermission = require("../../../src/models/UserPermission");
-const Team = require("../../../src/models/Team")
+const Team = require("../../../src/models/Team");
+const { createNormalUser } = require("../../utils/testHelpers");
 
-describe("Team details update", () => {
-    it("should update team details", async () => {
-        //GIVEN
-        const password = "test";
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await User.create({
-            name: "User",
-            firstname: "Test",
-            email: "test@gmail.com",
-            photo: "0753904652",
-            password: hashedPassword,
-            Id_universities: 1
-        });
-        const role = await Permission.findByName("user")
-        await UserPermission.create({id_user: user.id_user, Id_roles: role.Id_roles})
-        const responseToken = await request(app)
-            .post("/api/v1/auth/login")
-            .set("content-type", "application/json")
-            .send({
-                email: "test@gmail.com",
-                password: "test",
-            });
-        const token= responseToken.body.token
-        await Team.create({
-            name: "Aie",
-            dateCreate: new Date(),
-        })
-        //WHEN
-        const response = await request(app)
-            .patch("/api/v1/teams/1")
-            .set("Authorization", `Bearer ${token}`)
-            .set("content-type", "application/json")
-            .send({
-                name: "Lol",
-                email: "test@gmail.com"
-            })
-        //THEN
-        expect(response.status).toBe(200);
-        const teamResult = await Team.findById(1)
-        expect(teamResult.name).toBe("Lol")
+describe("Équipes - Mise à jour", () => {
+  describe("PATCH /api/v1/teams/:id", () => {
+    it("devrait mettre à jour les détails d'une équipe", async () => {
+      // GIVEN
+      const team = await Team.create({
+        name: "Ancien Nom",
+        dateCreate: new Date(),
+      });
+      const { token } = await createNormalUser();
+
+      const updatedData = { name: "Nouveau Nom" };
+
+      // WHEN
+      const response = await request(app)
+        .patch(`/api/v1/teams/${team.Id_teams}`)
+        .set("Authorization", `Bearer ${token}`)
+        .send(updatedData);
+
+      // THEN
+      expect(response.status).toBe(200);
+      expect(response.body.ok).toBe(true);
+
+      const teamResult = await Team.findById(team.Id_teams);
+      expect(teamResult.name).toBe(updatedData.name);
     });
+
+    it("devrait retourner 404 pour une équipe inexistante", async () => {
+      // GIVEN
+      const { token } = await createNormalUser();
+
+      // WHEN
+      const response = await request(app)
+        .patch("/api/v1/teams/999999")
+        .set("Authorization", `Bearer ${token}`)
+        .send({ name: "Test" });
+
+      // THEN
+      expect(response.status).toBe(404);
+    });
+
+    it("should reject request without authentication", async () => {
+      // WHEN
+      const response = await request(app)
+        .patch("/api/v1/teams/1")
+        .send({ name: "Test" });
+
+      // THEN
+      expect(response.status).toBe(401);
+    });
+  });
 });

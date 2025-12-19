@@ -1,39 +1,32 @@
 const request = require("supertest");
 const app = require("../../../src");
-const Team = require("../../../src/models/Team");
 const { createNormalUser } = require("../../utils/testHelpers");
 
-describe("Équipes - Détails par ID", () => {
-  describe("GET /api/v1/teams/:id", () => {
-    it("devrait récupérer une équipe par son ID", async () => {
+describe("Universités - Détails par ID", () => {
+  describe("GET /api/v1/universities/:id", () => {
+    it("devrait récupérer une université par son ID", async () => {
       // GIVEN
-      const team = await Team.create({
-        name: "Équipe Test",
-        dateCreate: new Date(),
-      });
       const { token } = await createNormalUser();
 
       // WHEN
       const response = await request(app)
-        .get(`/api/v1/teams/${team.Id_teams}`)
+        .get("/api/v1/universities/1")
         .set("Authorization", `Bearer ${token}`);
 
       // THEN
       expect(response.status).toBe(200);
-      expect(response.body.data).toMatchObject({
-        id: team.Id_teams,
-        name: "Équipe Test",
-      });
-      expect(response.body.data.createdAt).toBeDefined();
+      expect(response.body.data).toBeDefined();
+      expect(response.body.data).toHaveProperty("Id_universities");
+      expect(response.body.data).toHaveProperty("name");
     });
 
-    it("devrait retourner 404 pour une équipe inexistante", async () => {
+    it("should return 404 for non-existent university", async () => {
       // GIVEN
       const { token } = await createNormalUser();
 
       // WHEN
       const response = await request(app)
-        .get("/api/v1/teams/999999")
+        .get("/api/v1/universities/999999")
         .set("Authorization", `Bearer ${token}`);
 
       // THEN
@@ -42,10 +35,11 @@ describe("Équipes - Détails par ID", () => {
 
     it("should reject request without authentication", async () => {
       // WHEN
-      const response = await request(app).get("/api/v1/teams/1");
+      const response = await request(app).get("/api/v1/universities/1");
 
       // THEN
       expect(response.status).toBe(401);
     });
   });
 });
+

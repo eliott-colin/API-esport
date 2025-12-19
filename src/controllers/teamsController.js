@@ -2,7 +2,7 @@ const teamsService = require("../services/teamsService");
 
 const updateTeamDetails = async (req, res) => {
   const { name } = req.body;
-  const teamId = req.auth.teamId;
+  const teamId = req.params.id;
   try {
     await teamsService.updateTeamDetails(teamId, name);
     res.status(200).json({ ok: true });
@@ -39,8 +39,8 @@ const getTeamById = async (req, res) => {
 const deleteTeam = async (req, res) => {
   const teamId = req.params.id;
   try {
-    const users = await teamsService.deleteTeam(teamId);
-    res.status(200).json({ data: users });
+    await teamsService.deleteTeam(teamId);
+    res.status(204).send();
   } catch (error) {
     res
       .status(error?.status || 500)
