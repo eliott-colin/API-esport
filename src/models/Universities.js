@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 const Universities = {
   findById: (id) =>
-    prisma.universities.findUnique({ where: { id_university: id } }),
+    prisma.universities.findUnique({ where: { id_university: Number(id) } }),
   list: () => prisma.universities.findMany(),
 };
 

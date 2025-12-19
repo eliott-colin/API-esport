@@ -3,12 +3,13 @@ const authService = require("../services/authService");
 const userRegistration = async (req, res) => {
   const { firstName, lastName, email, photo, password, idUniversities } =
     req.body;
+  const imagePath = req.file.path;
   try {
     const userRegistration = await authService.userRegistration(
       firstName,
       lastName,
       email,
-      photo,
+      imagePath,
       password,
       idUniversities,
     );

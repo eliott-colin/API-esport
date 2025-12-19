@@ -7,7 +7,7 @@ const userRegistration = async (
   firstName,
   lastName,
   email,
-  photo,
+  imagePath,
   password,
   idUniversities,
 ) => {
@@ -25,9 +25,9 @@ const userRegistration = async (
       name: lastName,
       firstname: firstName,
       email: email,
-      photo: photo,
+      photo: imagePath+".png",
       password: hashedPassword,
-      Id_universities: idUniversities,
+      Id_universities: Number(idUniversities),
     });
     const userPermissionDetails = await UserPermission.create({
       id_user: user.id_user,

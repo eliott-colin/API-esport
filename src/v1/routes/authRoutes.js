@@ -3,10 +3,13 @@ const authController = require("../../controllers/authController");
 const router = express.Router();
 const validator = require("express-joi-validation").createValidator({});
 const { userLoginSchema, userRegisterSchema } = require("./validators");
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
 
 router.post(
   "/register",
   validator.body(userRegisterSchema),
+  upload.single("image"),
   authController.userRegistration,
   /* #swagger.tags = ['Authentication']
      #swagger.summary = 'Inscription d\'un nouvel utilisateur' */
