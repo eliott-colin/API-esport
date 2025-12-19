@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 const Events = {
     create: (data) => prisma.events.create({ data }),
   findById: (id) =>
-    prisma.events.findUnique({ where: { id_events: id } }),
+    prisma.events.findUnique({ where: { Id_event: Number(id) } }),
   list: () => prisma.events.findMany(),
 };
 
