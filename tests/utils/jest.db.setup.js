@@ -14,7 +14,7 @@ async function assertTestDatabase() {
     );
   }
 }
-const PROTECTED_TABLES = new Set(["regions", "departements", "cities", "universities", "permission","eventGames"]);
+const PROTECTED_TABLES = new Set(["regions", "departements", "cities", "universities", "permission","eventGames","events"]);
 
 async function truncateAllTables() {
   await assertTestDatabase();

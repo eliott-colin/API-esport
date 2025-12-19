@@ -6,8 +6,8 @@ const Events = require("../../../src/models/Events");
 const Permission = require("../../../src/models/Permission");
 const UserPermission = require("../../../src/models/UserPermission");
 
-describe("Universities listing", () => {
-  it("should return all universities", async () => {
+describe("Events listing", () => {
+  it("should return all events", async () => {
     //GIVEN
     const password = "test";
         const hashedPassword = await bcrypt.hash(password, 10);

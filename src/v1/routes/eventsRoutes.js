@@ -14,4 +14,13 @@ router.get(
      #swagger.security = [{ "bearerAuth": [] }] */
 );
 
+router.get(
+  "/:id",
+  verifyToken,
+  eventsController.getEventById,
+  /* #swagger.tags = ['Events']
+     #swagger.summary = 'Récupérer un Event par son ID'
+     #swagger.security = [{ "bearerAuth": [] }] */
+);
+
 module.exports = router;
