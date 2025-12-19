@@ -15,12 +15,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const v1AuthRouter = require("./v1/routes/authRoutes");
 const v1UsersRouter = require("./v1/routes/usersRoutes");
 const v1UniversitiesRouter = require("./v1/routes/universitiesRoutes");
+const v1EventsRouter = require("./v1/routes/eventsRoutes");
 
 
 // Routes
 app.use("/api/v1/auth", v1AuthRouter);
 app.use("/api/v1/users", v1UsersRouter);
 app.use("/api/v1/universities", v1UniversitiesRouter)
+app.use("/api/v1/events", v1EventsRouter);
 
 // Swagger documentation
 const swaggerPath = path.join(__dirname, "v1", "swagger.json");
