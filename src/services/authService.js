@@ -3,6 +3,7 @@ const User = require("../models/User");
 const UserPermission = require("../models/UserPermission");
 const Permission = require("../models/Permission");
 const jwt = require("jsonwebtoken");
+
 const userRegistration = async (
   firstName,
   lastName,
@@ -49,6 +50,7 @@ const userRegistration = async (
     throw { status: error?.status || 500, message: error?.message || error };
   }
 };
+
 
 const userConnection = async (email, password) => {
   try {

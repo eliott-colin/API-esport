@@ -154,6 +154,9 @@
           "401": {
             "description": "Unauthorized"
           },
+          "403": {
+            "description": "Forbidden"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -208,6 +211,9 @@
           "401": {
             "description": "Unauthorized"
           },
+          "403": {
+            "description": "Forbidden"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -250,6 +256,9 @@
           "401": {
             "description": "Unauthorized"
           },
+          "403": {
+            "description": "Forbidden"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -289,6 +298,9 @@
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"
@@ -344,6 +356,43 @@
           }
         ],
         "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/universities": {
+      "get": {
+        "tags": [
+          "Universities"
+        ],
+        "summary": "Récupérer la liste de tous les Universités",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
           "200": {
             "description": "OK"
           },
@@ -361,14 +410,22 @@
         ]
       }
     },
-    "/api/v1/universities/list": {
+    "/api/v1/universities/{id}": {
       "get": {
         "tags": [
           "Universities"
         ],
-        "summary": "Récupérer la liste de tous les Universités",
+        "summary": "Récupérer une université par son ID",
         "description": "",
         "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "authorization",
             "in": "header",
@@ -548,6 +605,40 @@
           }
         ],
         "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/events": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Récupérer la liste de tous les Events",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
           "200": {
             "description": "OK"
           },
@@ -565,14 +656,22 @@
         ]
       }
     },
-    "/api/v1/events/list": {
+    "/api/v1/events/{id}": {
       "get": {
         "tags": [
           "Events"
         ],
-        "summary": "Récupérer la liste de tous les Events",
+        "summary": "Récupérer un Event par son ID",
         "description": "",
         "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "authorization",
             "in": "header",
