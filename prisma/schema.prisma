@@ -201,7 +201,7 @@ model users {
   name            String?           @db.VarChar(50)
   firstname       String?           @db.VarChar(50)
   email           String?           @db.VarChar(255)
-  password        String?           @db.VarChar(50)
+  password        String?           @db.VarChar(255)
   photo           String?           @db.VarChar(50)
   Id_universities Int
   isPart          isPart[]
