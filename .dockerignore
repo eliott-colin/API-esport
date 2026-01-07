@@ -1,0 +1,7 @@
+.qodo
+nodes_modules
+.DS_Store
+.gitignore
+nodes_modules
+*node_modules/*
+nodes_modules/**/*

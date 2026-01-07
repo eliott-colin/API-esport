@@ -10,7 +10,6 @@
 * [ ] Mettre en place le serveur backend
 
 ---
-
 ## 🗄️ Base de données
 
 * [ ] Créer la base de données

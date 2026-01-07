@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: projecta-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+      MYSQL_DATABASE: projecta_db
+      MYSQL_USER: projecta_user
+      MYSQL_PASSWORD: projecta_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql:/docker-entrypoint-initdb.d
+    networks:
+      - db
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: projecta-phpmyadmin
+    environment:
+      PMA_HOST: mysql
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.projecta-pma.rule=Host(`pma.projecta.localhost`)
+      - traefik.http.services.projecta-pma.loadbalancer.server.port=80
+    networks:
+      - db
+      - proxy
+
+  api:
+    build: ./api
+    container_name: projecta-api
+    depends_on:
+      - mysql
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.projecta-api.rule=Host(`api.projecta.localhost`)
+      - traefik.http.services.projecta-api.loadbalancer.server.port=3000
+    networks:
+      - db
+      - proxy
+
+networks:
+  proxy:
+    external: true   # 👈 réseau Traefik global
+  db:
+    driver: bridge
+
+volumes:
+  mysql_data:
