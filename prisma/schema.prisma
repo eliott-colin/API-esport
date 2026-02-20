@@ -129,7 +129,7 @@ model participate {
 model permission {
   Id_roles        Int               @id @default(autoincrement())
   name            String?           @db.VarChar(50)
-  userPermissions userPermissions[]
+  userpermissions userpermissions[]
 }
 
 model playing {
@@ -186,7 +186,7 @@ model universities {
   @@index([Id_cities], map: "Id_cities")
 }
 
-model userPermissions {
+model userpermissions {
   id_user    Int
   Id_roles   Int
   users      users      @relation(fields: [id_user], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "userpermissions_ibfk_1")
@@ -207,7 +207,7 @@ model users {
   isPart          isPart[]
   participate     participate[]
   refereeOn       refereeOn[]
-  userPermissions userPermissions[]
+  userpermissions userpermissions[]
   universities    universities      @relation(fields: [Id_universities], references: [Id_universities], onDelete: NoAction, onUpdate: NoAction, map: "users_ibfk_1")
 
   @@index([Id_universities], map: "Id_universities")
