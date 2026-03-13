@@ -7,7 +7,6 @@ const { idParamSchema } = require("./validators");
 
 router.get(
   "",
-  verifyToken,
   universitiesController.getAllUniversities,
   /* #swagger.tags = ['Universities']
      #swagger.summary = 'Récupérer la liste de tous les Universités'
