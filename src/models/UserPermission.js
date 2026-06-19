@@ -1,10 +1,10 @@
 const prisma = require("../v1/prisma");
 
 const UserPermission = {
-  create: (data) => prisma.userPermissions.create({ data }),
+  create: (data) => prisma.userpermissions.create({ data }),
   findByUserId: (id) =>
-    prisma.userPermissions.findMany({ where: { id_user: Number(id) } }),
-  findAll: () => prisma.userPermissions.findMany(),
+    prisma.userpermissions.findMany({ where: { id_user: Number(id) } }),
+  findAll: () => prisma.userpermissions.findMany(),
 };
 
 module.exports = UserPermission;
